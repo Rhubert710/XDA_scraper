@@ -12,7 +12,7 @@ bs = BeautifulSoup(html.text, 'html.parser')
 # Tries to open the file
 try:
     csv_file = open('XDA_data.csv', 'w')
-    fieldnames = ['Headline', 'Excerpt']
+    fieldnames = ['Headline', 'Excerpt', 'Author', 'Date_Posted']
     dictwriter = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
     # Writes the headers
@@ -23,6 +23,8 @@ try:
         print('wwwwww')
         headlines =[]
         excerpts = []
+        authors = []
+        dates = []
         
         for article in bs.find_all('div', class_ ="row latest-news-2"):
 
@@ -38,6 +40,20 @@ try:
                 excerpts.append(excerpt.text)
                 # print(excerpt.text)
                 # print('eeeeeeee')
+
+            for author in article.find_all('span', class_ = 'meta_author'):
+    
+                authors.append(author.text)
+                # print(author.text)
+                # print('aaaaaaaaa')
+
+            for date in article.find_all('span', class_ = 'meta_date'):
+        
+                dates.append(date.text)
+                # print(date.text)
+                # print('ddddddddd')
+
+            
             # print(article.text)
             # print('oooooooooo')
             # print(headlines)
@@ -50,7 +66,7 @@ try:
 
         for i in range(len(headlines)):
             #writes all headlines into csv
-            dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i]})
+            dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
 
 
             print('tru')
