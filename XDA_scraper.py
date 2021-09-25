@@ -18,13 +18,16 @@ try:
     # Writes the headers
     dictwriter.writeheader()
 
+    headlines =[]
+    excerpts = []
+    authors = []
+    dates = []
+    pages = 5 # limits number of pages
+
     while True:
 
         print('wwwwww')
-        headlines =[]
-        excerpts = []
-        authors = []
-        dates = []
+        
         
         for article in bs.find_all('div', class_ ="row latest-news-2"):
 
@@ -44,8 +47,8 @@ try:
             for author in article.find_all('span', class_ = 'meta_author'):
     
                 authors.append(author.text)
-                # print(author.text)
-                # print('aaaaaaaaa')
+                print(author.text)
+                print('aaaaaaaaa')
 
             for date in article.find_all('span', class_ = 'meta_date'):
         
@@ -53,27 +56,37 @@ try:
                 # print(date.text)
                 # print('ddddddddd')
 
-            
-            # print(article.text)
-            # print('oooooooooo')
-            # print(headlines)
+            # for a in bs.find_all('a', class_ = 'next page-numbers'):
+        
+                # a.append(date.text)
+                # print(a['href'])
+                # print('nnnnnnnnn')
 
+        next = bs.find('a', class_ = 'next page-numbers')
+        print(next['href'])
+        html = requests.get(next['href'])
+        bs = BeautifulSoup(html.text, 'html.parser')
         # print(headlines)
         # print(excerpts)
 
         # print(len(headlines))
         # print(len(excerpts))
 
-        for i in range(len(headlines)):
-            #writes all headlines into csv
-            dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
+        # for i in range(len(headlines)):
+        #     #writes all headlines into csv
+        #     dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
 
 
-            print('tru')
+            # print('tru')
         
-
-
-        break
+        pages -= 1
+        print(pages)
+        if pages == 0:
+            print('999999999')
+            for i in range(len(headlines)):
+                #writes all headlines into csv
+                dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
+            break
 except:
     print('Unknown Error!!!')
 finally:
