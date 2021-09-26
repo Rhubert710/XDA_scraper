@@ -1,2 +1,2 @@
 # XDA_scraper
-Scapes XDA-developers.com
+Scapes article, headlines, excerpts, author and date posted from XDA-developers.com.  
