@@ -18,75 +18,48 @@ try:
     # Writes the headers
     dictwriter.writeheader()
 
-    headlines =[]
+    headlines = []
     excerpts = []
     authors = []
     dates = []
-    pages = 5 # limits number of pages
+    pages = 2  # limits number of pages
 
     while True:
 
-        print('wwwwww')
-        
-        
-        for article in bs.find_all('div', class_ ="row latest-news-2"):
-
+        for article in bs.find_all('div', class_="row latest-news-2"):
 
             for headline in article.find_all('h4'):
 
                 headlines.append(headline.text)
-                # print(headline.text)
-                # print('hhhhhh')
 
-            for excerpt in article.find_all('div', class_ = 'the-excerpt'):
+            for excerpt in article.find_all('div', class_='the-excerpt'):
 
-                excerpts.append(excerpt.text)
-                # print(excerpt.text)
-                # print('eeeeeeee')
+                excerpt_str = str(excerpt.text)
+                excerpts.append(excerpt_str.replace(',', ''))
 
-            for author in article.find_all('span', class_ = 'meta_author'):
-    
+            for author in article.find_all('span', class_='meta_author'):
+
                 authors.append(author.text)
-                print(author.text)
-                print('aaaaaaaaa')
 
-            for date in article.find_all('span', class_ = 'meta_date'):
-        
+            for date in article.find_all('span', class_='meta_date'):
+
                 dates.append(date.text)
-                # print(date.text)
-                # print('ddddddddd')
 
-            # for a in bs.find_all('a', class_ = 'next page-numbers'):
-        
-                # a.append(date.text)
-                # print(a['href'])
-                # print('nnnnnnnnn')
-
-        next = bs.find('a', class_ = 'next page-numbers')
-        print(next['href'])
-        html = requests.get(next['href'])
+        next_page_url = bs.find('a', class_='next page-numbers')
+        print(next_page_url['href'])
+        html = requests.get(next_page_url['href'])
         bs = BeautifulSoup(html.text, 'html.parser')
-        # print(headlines)
-        # print(excerpts)
 
-        # print(len(headlines))
-        # print(len(excerpts))
-
-        # for i in range(len(headlines)):
-        #     #writes all headlines into csv
-        #     dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
-
-
-            # print('tru')
-        
         pages -= 1
-        print(pages)
         if pages == 0:
-            print('999999999')
-            for i in range(len(headlines)):
-                #writes all headlines into csv
-                dictwriter.writerow({'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
-            break
+
+            if len(headlines) == len(excerpts) == len(authors) == len(dates):
+
+                for i in range(len(headlines)):
+                    # writes data into csv
+                    dictwriter.writerow(
+                        {'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
+                break
 except:
     print('Unknown Error!!!')
 finally:
