@@ -5,9 +5,8 @@ import requests
 
 def update_url(url):
     # Getting the html file and parsing with html.parser
-    html = requests.get(url)
-    bs = BeautifulSoup(html.text, 'html.parser')
-    return bs
+    req = requests.get(url)
+    return BeautifulSoup(req.text, 'html.parser')
 
 bs = update_url('https://www.xda-developers.com/')
 
