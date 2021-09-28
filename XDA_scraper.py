@@ -2,14 +2,15 @@ import csv
 from bs4 import BeautifulSoup
 import requests
 
-# URL to the website
-URL = 'https://www.xda-developers.com/'
 
-# Getting the html file and parsing with html.parser
-html = requests.get(URL)
-bs = BeautifulSoup(html.text, 'html.parser')
+def update_url(url):
+    # Getting the html file and parsing with html.parser
+    html = requests.get(url)
+    bs = BeautifulSoup(html.text, 'html.parser')
+    return bs
 
-# Tries to open the file
+bs = update_url('https://www.xda-developers.com/')
+
 try:
     csv_file = open('XDA_data.csv', 'w')
     fieldnames = ['Headline', 'Excerpt', 'Author', 'Date_Posted']
@@ -18,24 +19,25 @@ try:
     # Writes the headers
     dictwriter.writeheader()
 
-    headlines = []
-    excerpts = []
-    authors = []
-    dates = []
-    pages = 2  # limits number of pages
+    number_of_pages_to_scrape = 2  # limits number of pages
+    PAGES = number_of_pages_to_scrape
 
     while True:
+
+        headlines = []
+        excerpts = []
+        authors = []
+        dates = []
 
         for article in bs.find_all('div', class_="row latest-news-2"):
 
             for headline in article.find_all('h4'):
 
-                headlines.append(headline.text)
+                headlines.append(headline.text.replace(',', ''))
 
             for excerpt in article.find_all('div', class_='the-excerpt'):
 
-                excerpt_str = str(excerpt.text)
-                excerpts.append(excerpt_str.replace(',', ''))
+                excerpts.append(excerpt.text.replace(',', ''))
 
             for author in article.find_all('span', class_='meta_author'):
 
@@ -45,21 +47,28 @@ try:
 
                 dates.append(date.text)
 
-        next_page_url = bs.find('a', class_='next page-numbers')
-        print(next_page_url['href'])
-        html = requests.get(next_page_url['href'])
-        bs = BeautifulSoup(html.text, 'html.parser')
 
-        pages -= 1
-        if pages == 0:
+        # writes data into csv
+        if len(headlines) == len(excerpts) == len(authors) == len(dates):
 
-            if len(headlines) == len(excerpts) == len(authors) == len(dates):
+            for i in range(len(headlines)):
 
-                for i in range(len(headlines)):
-                    # writes data into csv
-                    dictwriter.writerow(
-                        {'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
-                break
+                dictwriter.writerow(
+                    {'Headline': headlines[i], 'Excerpt': excerpts[i], 'Author': authors[i], 'Date_Posted': dates[i]})
+
+
+        #updates bs to next pages url
+        bs = update_url(bs.find('a', class_='next page-numbers')['href'])
+
+
+        #condiotion: number of pages to scrape before break
+        number_of_pages_to_scrape -= 1
+        if number_of_pages_to_scrape == 0:
+
+            break
+
+    print(f'Sucessfully Scraped {PAGES} pages!')
+
 except:
     print('Unknown Error!!!')
 finally:
